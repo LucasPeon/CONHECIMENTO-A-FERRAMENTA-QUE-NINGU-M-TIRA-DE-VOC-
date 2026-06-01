@@ -20,7 +20,7 @@ body { background: #0D1B3E; font-family: 'DM Sans', sans-serif; min-height: 100v
 .canvas-placeholder svg { width: 24px; height: 24px; stroke: #00B4D8; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
 .canvas-placeholder p { font-size: 12px; color: rgba(255,255,255,0.5); text-align: center; line-height: 1.4; }
 .controls { width: 100%; max-width: 340px; padding: 0 20px; margin-top: 24px; display: flex; flex-direction: column; gap: 12px; }
-.btn-upload { width: 100%; padding: 16px; background: #00B4D8; color: #0D1B3E; font-size: 15px; font-weight: 900; letter-spacing: 0.5px; border: none; border-radius: 8px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; transition: background 0.2s; }
+.btn-upload { width: 100%; padding: 16px; background: #00B4D8; color: #0D1B3E; font-size: 15px; font-weight: 900; border: none; border-radius: 8px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; transition: background 0.2s; }
 .btn-upload:active { background: #0090b0; }
 .btn-upload svg { width: 20px; height: 20px; stroke: #0D1B3E; fill: none; stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round; }
 .slider-group { display: flex; flex-direction: column; gap: 6px; }
@@ -32,7 +32,7 @@ input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; width: 18px;
 .text-opt.active { border-color: #FFD700; background: rgba(255,215,0,0.1); }
 .text-opt span { font-size: 11px; color: rgba(255,255,255,0.6); display: block; line-height: 1.3; }
 .text-opt.active span { color: #FFD700; }
-.btn-download { width: 100%; padding: 16px; background: #FFD700; color: #0D1B3E; font-size: 15px; font-weight: 900; letter-spacing: 0.5px; border: none; border-radius: 8px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; transition: background 0.2s; opacity: 0.4; pointer-events: none; }
+.btn-download { width: 100%; padding: 16px; background: #FFD700; color: #0D1B3E; font-size: 15px; font-weight: 900; border: none; border-radius: 8px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; transition: background 0.2s; opacity: 0.4; pointer-events: none; }
 .btn-download.ready { opacity: 1; pointer-events: all; }
 .btn-download:active { background: #e6c200; }
 .btn-download svg { width: 20px; height: 20px; stroke: #0D1B3E; fill: none; stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round; }
@@ -115,17 +115,24 @@ document.getElementById('file-input').addEventListener('change', function(e) {
   reader.readAsDataURL(file);
 });
 
-document.getElementById('zoom-slider').addEventListener('input', function() { zoom = this.value/100; document.getElementById('zoom-val').textContent = this.value+'%'; draw(); });
-document.getElementById('pos-slider').addEventListener('input', function() { posY = parseInt(this.value); document.getElementById('pos-val').textContent = this.value>0?'+'+this.value:this.value; draw(); });
+document.getElementById('zoom-slider').addEventListener('input', function() {
+  zoom = this.value/100; document.getElementById('zoom-val').textContent = this.value+'%'; draw();
+});
+document.getElementById('pos-slider').addEventListener('input', function() {
+  posY = parseInt(this.value); document.getElementById('pos-val').textContent = this.value>0?'+'+this.value:this.value; draw();
+});
 
-function selectText(el) { document.querySelectorAll('.text-opt').forEach(e=>e.classList.remove('active')); el.classList.add('active'); topText=el.dataset.top; botText=el.dataset.bot; draw(); }
+function selectText(el) {
+  document.querySelectorAll('.text-opt').forEach(e=>e.classList.remove('active'));
+  el.classList.add('active'); topText=el.dataset.top; botText=el.dataset.bot; draw();
+}
 
 function draw() {
   ctx.clearRect(0,0,SIZE,SIZE);
-  ctx.save(); ctx.beginPath(); ctx.arc(SIZE/2,SIZE/2,SIZE/2,0,Math.PI*2); ctx.closePath(); ctx.clip();
+  ctx.save(); ctx.beginPath(); ctx.arc(SIZE/2,SIZE/2,SIZE/2,0,Math.PI*2); ctx.clip();
   ctx.fillStyle='#1B2E6B'; ctx.fillRect(0,0,SIZE,SIZE);
   if (userImg) {
-    const s=Math.max(SIZE,SIZE)*zoom, aspect=userImg.width/userImg.height;
+    const s=SIZE*zoom, aspect=userImg.width/userImg.height;
     let w,h; if(aspect>1){h=s;w=s*aspect;}else{w=s;h=s/aspect;}
     ctx.drawImage(userImg,(SIZE-w)/2,(SIZE-h)/2+posY,w,h);
   }
@@ -134,7 +141,7 @@ function draw() {
 }
 
 function drawFrame() {
-  const cx=SIZE/2,cy=SIZE/2,outerR=SIZE/2-2,innerR=SIZE/2-28,midR=(outerR+innerR)/2;
+  const cx=SIZE/2, cy=SIZE/2, outerR=SIZE/2-2, innerR=SIZE/2-28, midR=(outerR+innerR)/2;
   ctx.save();
   ctx.beginPath(); ctx.arc(cx,cy,outerR,0,Math.PI*2); ctx.arc(cx,cy,innerR,0,Math.PI*2,true); ctx.closePath();
   ctx.fillStyle='#0D1B3E'; ctx.fill();
@@ -149,13 +156,17 @@ function drawFrame() {
 
 function drawArcText(text,cx,cy,r,isTop) {
   ctx.save();
-  ctx.font="bold 20px 'DM Sans', sans-serif"; ctx.fillStyle='#FFFFFF'; ctx.textAlign='center'; ctx.textBaseline='middle';
+  ctx.font="bold 20px 'DM Sans', sans-serif";
+  ctx.fillStyle='#FFFFFF'; ctx.textAlign='center'; ctx.textBaseline='middle';
   const chars=text.split(''), charSpacing=0.11, totalSpan=charSpacing*(chars.length-1);
-  const startAngle=isTop ? -Math.PI/2-totalSpan/2 : Math.PI/2-totalSpan/2;
-  chars.forEach((ch,i)=>{
-    const angle=startAngle+i*charSpacing;
-    ctx.save(); ctx.translate(cx+r*Math.cos(angle),cy+r*Math.sin(angle));
-    ctx.rotate(angle+(isTop?Math.PI/2:-Math.PI/2)+Math.PI); ctx.fillText(ch,0,0); ctx.restore();
+  const startAngle = isTop ? -Math.PI/2 - totalSpan/2 : Math.PI/2 - totalSpan/2;
+  chars.forEach((ch,i) => {
+    const angle = startAngle + i*charSpacing;
+    ctx.save();
+    ctx.translate(cx+r*Math.cos(angle), cy+r*Math.sin(angle));
+    ctx.rotate(angle + (isTop ? Math.PI/2 : -Math.PI/2));
+    ctx.fillText(ch,0,0);
+    ctx.restore();
   });
   ctx.restore();
 }
@@ -180,8 +191,11 @@ function drawDots(cx,cy,r,count) {
 }
 
 function downloadFrame() {
-  if(!userImg)return;
-  const link=document.createElement('a'); link.download='meu-frame-juventude-estacio.png'; link.href=canvas.toDataURL('image/png'); link.click();
+  if(!userImg) return;
+  const link=document.createElement('a');
+  link.download='meu-frame-juventude-estacio.png';
+  link.href=canvas.toDataURL('image/png');
+  link.click();
 }
 draw();
 </script>
