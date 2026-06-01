@@ -158,18 +158,21 @@ function drawArcText(text,cx,cy,r,isTop) {
   ctx.save();
   ctx.font="bold 20px 'DM Sans', sans-serif";
   ctx.fillStyle='#FFFFFF'; ctx.textAlign='center'; ctx.textBaseline='middle';
-  const chars = isTop ? text.split('') : text.split('').reverse();
+  const chars = text.split('');
   const charSpacing=0.11, totalSpan=charSpacing*(chars.length-1);
   const startAngle = isTop
     ? -Math.PI/2 - totalSpan/2
-    : Math.PI/2 + totalSpan/2;
+    : Math.PI/2 - totalSpan/2;
   chars.forEach((ch,i) => {
-    const angle = isTop
-      ? startAngle + i*charSpacing
-      : startAngle - i*charSpacing;
+    const angle = startAngle + i*charSpacing;
     ctx.save();
     ctx.translate(cx+r*Math.cos(angle), cy+r*Math.sin(angle));
-    ctx.rotate(angle + Math.PI/2);
+    if (isTop) {
+      ctx.rotate(angle + Math.PI/2);
+    } else {
+      ctx.rotate(angle - Math.PI/2);
+      ctx.scale(-1, -1);
+    }
     ctx.fillText(ch,0,0);
     ctx.restore();
   });
